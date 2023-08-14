@@ -37,3 +37,4 @@ build/
 ### Mac OS ###
 .DS_Store
 /src/main/java/com/prachet/helper/StringRessource.java
+/src/main/java/com/prachet/utilities/StringRessource.java

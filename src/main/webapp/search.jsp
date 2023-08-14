@@ -1,6 +1,9 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.prachet.helper.MongoDB" %>
-<%@ page import="com.prachet.helper.StringRessource" %><%--
+<%@ page import="com.prachet.utilities.StringRessource" %>
+<%@ page import="com.prachet.utilities.Product" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %><%--
   Created by IntelliJ IDEA.
   User: PRACHET
   Date: 8/12/2023
@@ -107,7 +110,6 @@
 </div>
 <!-- Navbar End -->
 
-
 <!-- Page Header Start -->
 <div class="container-fluid bg-secondary mb-5">
     <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
@@ -158,7 +160,7 @@
                             <h5 class="font-weight-semi-bold mb-4">Filter by Material</h5>
                             <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
                                 <input type="radio" class="custom-control-input" checked id="materialall"
-                                       name="check" value="allmaterial">
+                                       name="check" value="allmaterial" >
                                 <label class="custom-control-label" for="materialall">All Materials</label>
                                 <span class="badge border font-weight-normal"></span>
                             </div>
@@ -172,17 +174,49 @@
                                 <label class="custom-control-label" for="material2">Cotton</label>
                                 <span class="badge border font-weight-normal"></span>
                             </div>
-                            <div class="container text-center"><button type="submit" class="btn border mt-2 mb-2 p-0" ><span style="width: 5em;
-    justify-content: space-around;font-weight: 500;" class="p-0 text-center input-group-text bg-transparent text-primary">Filter</span></button></div>
                         </div>
+                        <div class="border-bottom mb-4 pb-4">
+                            <h5 class="font-weight-semi-bold mb-4">Filter by Gender</h5>
+                            <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                                <input type="radio" class="custom-control-input" checked id="anygender" name="check1" value="anygender">
+                                <label class="custom-control-label" for="anygender">Any</label>
+                                <span class="badge border font-weight-normal"></span>
+                            </div>
+                            <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                                <input type="radio" class="custom-control-input" id="Male" value="Male" name="check1">
+                                <label class="custom-control-label" for="Male">Male</label>
+                                <span class="badge border font-weight-normal"></span>
+                            </div>
+                            <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                                <input type="radio" class="custom-control-input" id="Female" value="Female" name="check1">
+                                <label class="custom-control-label" for="Female">Female</label>
+                                <span class="badge border font-weight-normal"></span>
+                            </div>
+                        </div>
+                            <div class="container text-center"><button type="submit" class="btn border mt-2 mb-2 p-0" ><span style="width: 5em;
+    justify-content: space-around;font-weight: 500;" class="p-0 text-center input-group-text bg-transparent text-primary" ><span style="color:#666;">Filter</span></span></button></div>
                     </form>
                 </div>
-                <% MongoDB db = new MongoDB();
+                <%
+                    MongoDB db = new MongoDB();
                     String st = request.getParameter("searchtext");
-                    ArrayList<ArrayList<String>> searcheditems = db.searchByName(StringRessource.getCollection(0), st);
-                    request.setAttribute("search", searcheditems);
+                    if(st!=null) {
+                        ArrayList<ArrayList<String>> searcheditems = db.searchByName(StringRessource.getCollection(0), st);
+                        request.setAttribute("search", searcheditems);
+                    }
+                    else {
+                        request.setAttribute("search", null);
+                    }
                 %>
-                <c:if test="${search.size()>=1}">
+                <%
+                    if(session.getAttribute("productMap")==null){
+                        ArrayList<ArrayList<String>> products = db.getAllCollection(StringRessource.getCollection(0));
+                        Map<Integer,Product> productMap=db.getAllProductsMap(products);
+                        session.setAttribute("productMap", productMap);
+                        session.setAttribute("products", products);
+                    }
+                %>
+                <c:if test="${search!=null && search.size()>=1}">
                     <c:forEach var="x" begin="0" end="${search.size()-1}">
                         <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
                             <div class="card product-item border-0 mb-4">
@@ -213,27 +247,6 @@
                         </div>
                     </c:forEach>
                 </c:if>
-                <%--                <div class="col-12 pb-1">--%>
-                <%--                    <nav aria-label="Page navigation">--%>
-                <%--                        <ul class="pagination justify-content-center mb-3">--%>
-                <%--                            <li class="page-item disabled">--%>
-                <%--                                <a class="page-link" href="#" aria-label="Previous">--%>
-                <%--                                    <span aria-hidden="true">&laquo;</span>--%>
-                <%--                                    <span class="sr-only">Previous</span>--%>
-                <%--                                </a>--%>
-                <%--                            </li>--%>
-                <%--                            <li class="page-item active"><a class="page-link" href="#">1</a></li>--%>
-                <%--                            <li class="page-item"><a class="page-link" href="#">2</a></li>--%>
-                <%--                            <li class="page-item"><a class="page-link" href="#">3</a></li>--%>
-                <%--                            <li class="page-item">--%>
-                <%--                                <a class="page-link" href="#" aria-label="Next">--%>
-                <%--                                    <span aria-hidden="true">&raquo;</span>--%>
-                <%--                                    <span class="sr-only">Next</span>--%>
-                <%--                                </a>--%>
-                <%--                            </li>--%>
-                <%--                        </ul>--%  >
-                <%--                    </nav>--%>
-                <%--                </div>--%>
             </div>
         </div>
         <!-- Shop Product End -->
@@ -242,83 +255,7 @@
 <!-- Shop End -->
 
 
-<!-- Footer Start -->
-<div class="container-fluid bg-secondary text-dark mt-5 pt-5">
-    <div class="row px-xl-5 pt-5">
-        <div class="col-lg-6 col-md-12 mb-5 pr-3 pr-xl-5">
-            <a href="" class="text-decoration-none">
-                <h1 class="mb-4 display-5 font-weight-semi-bold"><span
-                        class="text-primary font-weight-bold border border-white px-3 mr-1">CT</span>Customist</h1>
-            </a>
-            <p>Dolore erat dolor sit lorem vero amet. Sed sit lorem magna, ipsum no sit erat lorem et magna ipsum dolore
-                amet erat.</p>
-            <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
-            <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
-            <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>
-        </div>
-        <div class="col-lg-6 col-md-12">
-            <div class="row">
-                <div class="col-md-4 mb-5">
-                    <h5 class="font-weight-bold text-dark mb-4">Quick Links</h5>
-                    <div class="d-flex flex-column justify-content-start">
-                        <a class="text-dark mb-2" href="index.jsp"><i class="fa fa-angle-right mr-2"></i>Home</a>
-                        <a class="text-dark mb-2" href="shop.jsp"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
-
-                        <a class="text-dark mb-2" href="cart.jsp"><i class="fa fa-angle-right mr-2"></i>Shopping
-                            Cart</a>
-                        <a class="text-dark mb-2" href="checkout.jsp"><i
-                                class="fa fa-angle-right mr-2"></i>Checkout</a>
-                        <a class="text-dark" href="contact.jsp"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row border-top border-light mx-xl-5 py-4">
-        <div class="col-lg-12 col-md-6 px-xl-0">
-            <p class="mb-md-0 text-center text-md-left text-dark">
-                &copy; <a class="text-dark font-weight-semi-bold" href="#">Customist</a>. All Rights Reserved. Designed
-                by
-                <a class="text-dark font-weight-semi-bold" href="https://htmlcodex.com">HTML Codex</a>
-
-                Distributed By <a href="https://themewagon.com" target="_blank">ThemeWagon</a>
-                Edited By <a href="https://themewagon.com" target="_blank">Prachet</a>
-            </p>
-        </div>
-    </div>
-    <div class="row bg-secondary py-2 px-xl-5 footer">
-        <div class="col-lg-6 d-none d-lg-block">
-            <div class="d-inline-flex align-items-center">
-                <a class="text-dark" href="">FAQs</a>
-                <span class="text-muted px-2">|</span>
-                <a class="text-dark" href="">Help</a>
-                <span class="text-muted px-2">|</span>
-                <a class="text-dark" href="">Support</a>
-            </div>
-        </div>
-        <div class="col-lg-6 text-center text-lg-right">
-            <div class="d-inline-flex align-items-center">
-                <a class="text-dark px-2" href="">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a class="text-dark px-2" href="">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <a class="text-dark px-2" href="">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-                <a class="text-dark px-2" href="">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a class="text-dark pl-2" href="">
-                    <i class="fab fa-youtube"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Footer End -->
-
+<%@ include file="footer_normal.jsp"%>
 
 <!-- Back to Top -->
 <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
