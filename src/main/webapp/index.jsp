@@ -60,10 +60,17 @@
                 </div>
             </form>
         </div>
+        <%
+            Integer itemcount=null;
+            itemcount=(Integer) session.getAttribute("cartitemnumber");
+            if(itemcount!=null){
+                request.setAttribute("count",itemcount);
+            }else request.setAttribute("count",0);
+        %>
         <div class="col-lg-2 col-6 text-right">
             <a href="cart.jsp" class="btn border">
                 <i class="fas fa-shopping-cart text-primary"></i>
-                <span class="badge">0</span>
+                <span class="badge">${count}</span>
             </a>
         </div>
     </div>
@@ -202,7 +209,7 @@
                                 <button type="submit" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View
                                     Detail</button>
                             </form>
-                            <a href="cart.jsp" class="btn btn-sm text-dark p-0"><i
+                            <a href="cart" class="btn btn-sm text-dark p-0"><i
                                     class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart</a>
                         </div>
                     </div>

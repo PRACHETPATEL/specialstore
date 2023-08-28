@@ -17,7 +17,6 @@ import java.util.Set;
 public class MongoDB {
 
     private static MongoClient client = null;
-    private static MongoDatabase database = null;
 
     public static MongoClient getClient() {
         if (client == null) {
@@ -26,19 +25,10 @@ public class MongoDB {
         }
         return client;
     }
-
-    public static MongoDatabase getDatabase() {
-        if (client != null && database == null) {
-            database = client.getDatabase(StringRessource.getDatabase());
-            System.out.println("Connection Database Successful");
-        }
-        return database;
-    }
-
     public ArrayList<ArrayList<String>> getAllCollection(String CollectionName) {
         ArrayList<ArrayList<String>> records = new ArrayList<>();
-        client = MongoDB.getClient();
-        MongoDatabase database = MongoDB.getDatabase();
+        MongoClient client = MongoDB.getClient();
+        MongoDatabase database = client.getDatabase(StringRessource.getDatabase());
         MongoCollection<Document> collection = database.getCollection(CollectionName);
         MongoCursor<Document> cursor = collection.find().cursor();
         while (cursor.hasNext()) {
@@ -55,8 +45,8 @@ public class MongoDB {
 
     public ArrayList<ArrayList<String>> filter(String CollectionName, ArrayList<String> color, ArrayList<String> size) {
         ArrayList<ArrayList<String>> records = new ArrayList<>();
-        client = MongoDB.getClient();
-        MongoDatabase database = MongoDB.getDatabase();
+        MongoClient client = MongoDB.getClient();
+        MongoDatabase database = client.getDatabase(StringRessource.getDatabase());
         MongoCollection<Document> collection = database.getCollection(CollectionName);
         BasicDBObject query = (BasicDBObject) new BasicDBObject("size", size).put("color",color);
         assert query != null;
@@ -72,11 +62,10 @@ public class MongoDB {
         }
         return records;
     }
-
     public ArrayList<ArrayList<String>> searchByMaterial(String CollectionName, String text) {
         ArrayList<ArrayList<String>> records = new ArrayList<>();
-        client = MongoDB.getClient();
-        MongoDatabase database = MongoDB.getDatabase();
+        MongoClient client = MongoDB.getClient();
+        MongoDatabase database = client.getDatabase(StringRessource.getDatabase());
         MongoCollection<Document> collection = database.getCollection(CollectionName);
         BasicDBObject query = new BasicDBObject("material", text);
         MongoCursor<Document> dt = collection.find(query).cursor();
@@ -93,8 +82,8 @@ public class MongoDB {
     }
     public ArrayList<ArrayList<String>> filterByMaterialAndGender(String CollectionName, String text,String gender) {
         ArrayList<ArrayList<String>> records = new ArrayList<>();
-        client = MongoDB.getClient();
-        MongoDatabase database = MongoDB.getDatabase();
+        MongoClient client = MongoDB.getClient();
+        MongoDatabase database = client.getDatabase(StringRessource.getDatabase());
         MongoCollection<Document> collection = database.getCollection(CollectionName);
         BasicDBObject query = new BasicDBObject("material", text);
         query.put("gender",gender);
@@ -112,8 +101,8 @@ public class MongoDB {
     }
     public ArrayList<ArrayList<String>> searchByGender(String CollectionName, String text) {
         ArrayList<ArrayList<String>> records = new ArrayList<>();
-        client = MongoDB.getClient();
-        MongoDatabase database = MongoDB.getDatabase();
+        MongoClient client = MongoDB.getClient();
+        MongoDatabase database = client.getDatabase(StringRessource.getDatabase());
         MongoCollection<Document> collection = database.getCollection(CollectionName);
         BasicDBObject query = new BasicDBObject("gender", text);
         MongoCursor<Document> dt = collection.find(query).cursor();
@@ -141,11 +130,10 @@ public class MongoDB {
         }
         return productMap;
     }
-
     public ArrayList<ArrayList<String>> searchByName(String CollectionName, String text) {
         ArrayList<ArrayList<String>> records = new ArrayList<>();
         MongoClient client = MongoDB.getClient();
-        MongoDatabase database = MongoDB.getDatabase();
+        MongoDatabase database = client.getDatabase(StringRessource.getDatabase());
         MongoCollection<Document> collection = database.getCollection(CollectionName);
         collection.createIndex(Indexes.text("name"));
         Bson filter = Filters.text(text);

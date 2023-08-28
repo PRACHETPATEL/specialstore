@@ -67,10 +67,17 @@
                 </div>
             </form>
         </div>
+        <%
+            Integer itemcount=null;
+            itemcount=(Integer) session.getAttribute("cartitemnumber");
+            if(itemcount!=null){
+                request.setAttribute("count",itemcount);
+            }else request.setAttribute("count",0);
+        %>
         <div class="col-lg-2 col-6 text-right">
             <a href="cart.jsp" class="btn border">
                 <i class="fas fa-shopping-cart text-primary"></i>
-                <span class="badge">0</span>
+                <span class="badge">${count}</span>
             </a>
         </div>
     </div>

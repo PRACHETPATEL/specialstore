@@ -66,10 +66,17 @@
                 </div>
             </form>
         </div>
+        <%
+            Integer itemcount=null;
+            itemcount=(Integer) session.getAttribute("cartitemnumber");
+            if(itemcount!=null){
+                request.setAttribute("count",itemcount);
+            }else request.setAttribute("count",0);
+        %>
         <div class="col-lg-2 col-6 text-right">
             <a href="cart.jsp" class="btn border">
                 <i class="fas fa-shopping-cart text-primary"></i>
-                <span class="badge">0</span>
+                <span class="badge">${count}</span>
             </a>
         </div>
     </div>
@@ -112,7 +119,8 @@
 </div>
 </div>
 <!-- Navbar End -->
-<%!Product product=null;
+<%!
+    Product product=null;
     MongoDB db=null;
 %>
 <%
@@ -135,8 +143,10 @@
 %>
 <!-- Shop Detail Start -->
 <c:if test="${productdetail!=null}">
+
     <div class="container-fluid py-5">
         <div class="row px-xl-5">
+
             <div class="col-lg-5 pb-5">
                 <div id="product-carousel" class="carousel slide" data-ride="carousel">
                     <div class="carousel-inner border">
@@ -179,9 +189,10 @@
                     ea. Sanc invidunt ipsum et, labore clita lorem magna lorem ut. Erat lorem duo dolor no sea nonumy.
                     Accus labore stet, est lorem sit diam sea et justo, amet at lorem et eirmod ipsum diam et rebum kasd
                     rebum.</p>
+                <form action="cart" method="post">
                 <div class="d-flex mb-3">
                     <p class="text-dark font-weight-medium mb-0 mr-3">Sizes:</p>
-                    <form>
+
                         <c:set var="i" value="1"></c:set>
                         <c:forEach var="x" items="${productdetail.size}">
                             <c:choose>
@@ -203,11 +214,9 @@
                                 </c:otherwise>
                             </c:choose>
                         </c:forEach>
-                    </form>
                 </div>
                 <div class="d-flex mb-4">
                     <p class="text-dark font-weight-medium mb-0 mr-3">Colors:</p>
-                    <form>
                         <c:set var="i" value="1"></c:set>
                         <c:forEach var="x" items="${productdetail.color}">
                             <c:choose>
@@ -229,9 +238,9 @@
                                 </c:otherwise>
                             </c:choose>
                         </c:forEach>
-                    </form>
                 </div>
                 <div class="d-flex align-items-center mb-4 pt-2">
+
                     <div class="input-group quantity mr-3" style="width: 130px;">
                         <div class="input-group-btn">
                             <button class="btn btn-primary" onclick="quantityminus()">
@@ -239,16 +248,25 @@
                             </button>
                         </div>
                         <div class="form-control bg-secondary text-center" id="display">1</div>
+
                         <div class="input-group-btn">
                             <button class="btn btn-primary" onclick="quantityplus()">
                                 <i class="fa fa-plus"></i>
                             </button>
                         </div>
                     </div>
-                    <button class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
+
+                    <input type="hidden" value="1" name="quantity" id="cartitems">
+                    <input type="hidden" value="${productdetail.price}" name="price">
+                    <input type="hidden" value="${productdetail.name}" name="name">
+                    <input type="hidden" value="${productdetail.image}" name="image">
+                    <input type="hidden" value="${productdetail.id}" name="id">
+                    <button type="submit" class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
                 </div>
+                </form>
             </div>
         </div>
+
         <div class="row px-xl-5">
             <div class="col">
                 <div class="nav nav-tabs justify-content-center border-secondary mb-4">
@@ -349,7 +367,7 @@
                                         <i class="far fa-star"></i>
                                     </div>
                                 </div>
-                                <form>
+                                <form action="review" method="post">
                                     <div class="form-group">
                                         <label for="message">Your Review *</label>
                                         <textarea id="message" cols="30" rows="5" class="form-control"></textarea>
@@ -376,6 +394,7 @@
     <!-- Shop Detail End -->
 </c:if>
 <%
+    Cookie[] cookie=request.getCookies();
     String gender="";
     String material="";
     if(product!=null) {
@@ -455,18 +474,19 @@
 <script>
     let data = 1;
     document.getElementById("display").innerHTML = data;
+    document.getElementById("cartitems").value = data;
     function quantityplus() {
         if (data < 10) {
             data = data + 1;
-            console.log(data);
             document.getElementById("display").innerHTML  = data;
+            document.getElementById("cartitems").value = data;
         }
     }
     function quantityminus() {
         if (data > 1) {
             data = data - 1;
-            console.log(data);
             document.getElementById("display").innerHTML  = data;
+            document.getElementById("cartitems").value = data;
         }
     }
 </script>
