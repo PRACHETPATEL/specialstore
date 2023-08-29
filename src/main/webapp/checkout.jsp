@@ -1,15 +1,24 @@
-<%--
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="com.prachet.utilities.Cart" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="com.prachet.utilities.User" %><%--
   Created by IntelliJ IDEA.
   User: PRACHET
   Date: 8/12/2023
   Time: 7:36 PM
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page errorPage="error.jsp"%>
+<%--<%@ page errorPage="error.jsp"%>--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
+<%--<%--%>
+<%--    User user=(User)session.getAttribute("user");--%>
+<%--    if(user==null){--%>
+<%--        response.sendRedirect("login.jsp");--%>
+<%--    }--%>
+<%--%>--%>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <title>Checkout</title>
@@ -22,7 +31,8 @@
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet">
 
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
@@ -41,7 +51,8 @@
     <div class="row align-items-center py-3 px-xl-5">
         <div class="col-lg-4 d-none d-lg-block">
             <a href="" class="text-decoration-none">
-                <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">CT</span>Customist</h1>
+                <h1 class="m-0 display-5 font-weight-semi-bold"><span
+                        class="text-primary font-weight-bold border px-3 mr-1">CT</span>Customist</h1>
             </a>
         </div>
         <div class="col-lg-6 col-6 text-left">
@@ -59,11 +70,17 @@
             </form>
         </div>
         <%
-            Integer itemcount=null;
-            itemcount=(Integer) session.getAttribute("cartitemnumber");
-            if(itemcount!=null){
-                request.setAttribute("count",itemcount);
-            }else request.setAttribute("count",0);
+            Integer itemcount = null;
+            itemcount = (Integer) session.getAttribute("cartitemnumber");
+            if (itemcount != null) {
+                request.setAttribute("count", itemcount);
+            } else request.setAttribute("count", 0);
+            Map<Integer, Cart> cartitems = (Map<Integer, Cart>) session.getAttribute("cart");
+            Set<Map.Entry<Integer, Cart>> items = null;
+            if (cartitems != null) {
+                items = cartitems.entrySet();
+            }
+            request.setAttribute("items", items);
         %>
         <div class="col-lg-2 col-6 text-right">
             <a href="cart.jsp" class="btn border">
@@ -81,7 +98,8 @@
     <div class="row align-items-center py-3 px-xl-5">
         <nav class="col-lg-12 navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-xl-0">
             <a href="" class="text-decoration-none d-block d-lg-none">
-                <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">CT</span>Customist</h1>
+                <h1 class="m-0 display-5 font-weight-semi-bold"><span
+                        class="text-primary font-weight-bold border px-3 mr-1">CT</span>Customist</h1>
             </a>
             <button type="button" class="navbar-toggler my-2 " data-toggle="collapse" data-target="#navbarCollapse">
                 <span class="navbar-toggler-icon"></span>
@@ -99,10 +117,10 @@
                     </div>
                     <a href="contact.jsp" class="nav-item nav-link">Contact</a>
                 </div>
-                <div class="navbar-nav ml-auto py-0">
-                    <a href="" class="nav-item nav-link">Login</a>
-                    <a href="" class="nav-item nav-link">Register</a>
-                </div>
+<%--                <div class="navbar-nav ml-auto py-0">--%>
+<%--                    <a href="login.jsp" class="nav-item nav-link">Login</a>--%>
+<%--                    <a href="register.jsp" class="nav-item nav-link">Register</a>--%>
+<%--                </div>--%>
             </div>
         </nav>
     </div>
@@ -186,7 +204,8 @@
                     <div class="col-md-12 form-group">
                         <div class="custom-control custom-checkbox">
                             <input type="checkbox" class="custom-control-input" id="shipto">
-                            <label class="custom-control-label" for="shipto"  data-toggle="collapse" data-target="#shipping-address">Ship to different address</label>
+                            <label class="custom-control-label" for="shipto" data-toggle="collapse"
+                                   data-target="#shipping-address">Ship to different address</label>
                         </div>
                     </div>
                 </div>
@@ -249,32 +268,30 @@
                 </div>
                 <div class="card-body">
                     <h5 class="font-weight-medium mb-3">Products</h5>
-                    <div class="d-flex justify-content-between">
-                        <p>Colorful Stylish Shirt 1</p>
-                        <p>$150</p>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <p>Colorful Stylish Shirt 2</p>
-                        <p>$150</p>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <p>Colorful Stylish Shirt 3</p>
-                        <p>$150</p>
-                    </div>
+                    <c:set var="subtotal" value="0"></c:set>
+                    <c:if test="${items!=null}">
+                        <c:forEach var="item" items="${items}">
+                            <div class="d-flex justify-content-between">
+                                <p>${item.value.name}(${item.value.size}, ${item.value.color})x${item.value.quantity}</p>
+                                <p>&#8377; ${item.value.quantity*item.value.price}</p>
+                                <c:set var="subtotal" value="${subtotal+(item.value.quantity*item.value.price)}"></c:set>
+                            </div>
+                        </c:forEach>
+                    </c:if>
                     <hr class="mt-0">
                     <div class="d-flex justify-content-between mb-3 pt-1">
                         <h6 class="font-weight-medium">Subtotal</h6>
-                        <h6 class="font-weight-medium">$150</h6>
+                        <h6 class="font-weight-medium">&#8377; ${subtotal}</h6>
                     </div>
                     <div class="d-flex justify-content-between">
                         <h6 class="font-weight-medium">Shipping</h6>
-                        <h6 class="font-weight-medium">$10</h6>
+                        <h6 class="font-weight-medium">&#8377; 0</h6>
                     </div>
                 </div>
                 <div class="card-footer border-secondary bg-transparent">
                     <div class="d-flex justify-content-between mt-2">
                         <h5 class="font-weight-bold">Total</h5>
-                        <h5 class="font-weight-bold">$160</h5>
+                        <h5 class="font-weight-bold">&#8377; ${subtotal}</h5>
                     </div>
                 </div>
             </div>
@@ -285,19 +302,13 @@
                 <div class="card-body">
                     <div class="form-group">
                         <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="paypal">
-                            <label class="custom-control-label" for="paypal">Paypal</label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="directcheck">
-                            <label class="custom-control-label" for="directcheck">Direct Check</label>
+                            <input type="radio" class="custom-control-input" name="payment" id="paytm">
+                            <label class="custom-control-label" for="paytm">Paytm</label>
                         </div>
                     </div>
                     <div class="">
                         <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="banktransfer">
+                            <input type="radio" class="custom-control-input" name="payment" id="banktransfer" readonly>
                             <label class="custom-control-label" for="banktransfer">Bank Transfer</label>
                         </div>
                     </div>
@@ -310,7 +321,7 @@
     </div>
 </div>
 <!-- Checkout End -->
-<%@ include file="footer_normal.jsp"%>
+<%@ include file="footer_normal.jsp" %>
 
 <!-- Back to Top -->
 <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>

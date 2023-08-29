@@ -19,6 +19,20 @@ public class Cart {
         this.size = size;
         this.color = color;
     }
+
+    @Override
+    public String toString() {
+        return "[" +
+                "id " + id +
+                ",img " + img  +
+                ",name " + name +
+                ",quantity " + quantity +
+                ",price " + price +
+                ",size " + size  +
+                ",color " + color  +
+                ']';
+    }
+
     public String getId() {
         return id;
     }

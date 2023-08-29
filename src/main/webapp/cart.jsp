@@ -103,10 +103,10 @@
                     </div>
                     <a href="contact.jsp" class="nav-item nav-link">Contact</a>
                 </div>
-                <div class="navbar-nav ml-auto py-0">
-                    <a href="" class="nav-item nav-link">Login</a>
-                    <a href="" class="nav-item nav-link">Register</a>
-                </div>
+<%--                <div class="navbar-nav ml-auto py-0">--%>
+<%--                    <a href="login.jsp" class="nav-item nav-link">Login</a>--%>
+<%--                    <a href="register.jsp" class="nav-item nav-link">Register</a>--%>
+<%--                </div>--%>
             </div>
         </nav>
     </div>
@@ -201,7 +201,7 @@
                         <h5 class="font-weight-bold">&#8377; ${subtotal}</h5>
                     </div>
                     <form action="checkout.jsp" method="post">
-                        <input type="hidden" value="${subtotal}">
+                        <input type="hidden" value="${subtotal}" name="subtotal">
                         <button class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</button>
                     </form>
                 </div>

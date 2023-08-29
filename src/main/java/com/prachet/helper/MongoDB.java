@@ -5,6 +5,7 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.prachet.utilities.Product;
+import com.prachet.utilities.Review;
 import com.prachet.utilities.StringRessource;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -24,6 +25,47 @@ public class MongoDB {
             System.out.println("Connection Client Successful");
         }
         return client;
+    }
+    public ArrayList<ArrayList<String>> getReviews(){
+        ArrayList<ArrayList<String>> reviews=new ArrayList<>();
+        return reviews;
+    }
+    public void addReview(String CollectionName, Review review){
+        MongoClient client=MongoDB.getClient();
+        MongoDatabase database=client.getDatabase(StringRessource.getDatabase());
+        MongoCollection<Document> collection=database.getCollection(CollectionName);
+        Document document=new Document();
+        document.put("productid",review.getProductid());
+        document.put("rating",review.getRating());
+        document.put("review",review.getReview());
+        document.put("name",review.getName());
+        document.put("email",review.getEmail());
+        document.put("date",review.getDate());
+        collection.insertOne(document);
+    }
+    public ArrayList<Review> getReview(String CollectionName, String id){
+        ArrayList<Review> reviews=new ArrayList<Review>();
+        MongoClient client=MongoDB.getClient();
+        MongoDatabase database=client.getDatabase(StringRessource.getDatabase());
+        MongoCollection<Document> collection=database.getCollection(CollectionName);
+        BasicDBObject query = (BasicDBObject) new BasicDBObject("productid",id);
+        MongoCursor<Document> cursor=collection.find(query).cursor();
+        int totalrating=0;
+        while (cursor.hasNext()){
+            Document doc= (Document) cursor.next();
+            Set<Map.Entry<String, Object>> set = doc.entrySet();
+            ArrayList<String> r = new ArrayList<>();
+            for (Map.Entry<String, Object> x : set) {
+                r.add(x.getValue().toString());
+            }
+            if(r.size()>6) {
+                Review review = new Review(r.get(1), r.get(2), r.get(3), r.get(4), r.get(5), r.get(6));
+                totalrating+=Integer.parseInt(r.get(2));
+                reviews.add(review);
+            }
+        }
+        String x= String.valueOf(totalrating);
+        return reviews;
     }
     public ArrayList<ArrayList<String>> getAllCollection(String CollectionName) {
         ArrayList<ArrayList<String>> records = new ArrayList<>();

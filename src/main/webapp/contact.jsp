@@ -1,4 +1,4 @@
-<%--
+<%@ page import="com.prachet.utilities.User" %><%--
   Created by IntelliJ IDEA.
   User: PRACHET
   Date: 8/12/2023
@@ -99,10 +99,10 @@
                     </div>
                     <a href="contact.jsp" class="nav-item nav-link active">Contact</a>
                 </div>
-                <div class="navbar-nav ml-auto py-0">
-                    <a href="" class="nav-item nav-link">Login</a>
-                    <a href="" class="nav-item nav-link">Register</a>
-                </div>
+<%--                <div class="navbar-nav ml-auto py-0">--%>
+<%--                    <a href="login.jsp" class="nav-item nav-link">Login</a>--%>
+<%--                    <a href="register.jsp" class="nav-item nav-link">Register</a>--%>
+<%--                </div>--%>
             </div>
         </nav>
     </div>

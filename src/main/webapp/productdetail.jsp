@@ -4,7 +4,8 @@
 <%@ page import="com.prachet.utilities.StringRessource" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.prachet.helper.MongoDB" %>
-<%@ page import="java.util.Objects" %><%--
+<%@ page import="java.util.Objects" %>
+<%@ page import="com.prachet.utilities.Review" %><%--
   Created by IntelliJ IDEA.
   User: PRACHET
   Date: 8/12/2023
@@ -15,7 +16,6 @@
 <%--<%@ page errorPage="error.jsp" %>--%>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <title>Product Details</title>
@@ -36,7 +36,40 @@
 
     <!-- Libraries Stylesheet -->
     <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <style>
+        .rating:not(:checked) > input {
+            position: absolute;
+            appearance: none;
+        }
 
+        .rating:not(:checked) > label {
+            float: right;
+            cursor: pointer;
+            font-size: 30px;
+            color: #666;
+        }
+
+        .rating:not(:checked) > label:before {
+            content: '★';
+        }
+
+        .rating > input:checked + label:hover,
+        .rating > input:checked + label:hover ~ label,
+        .rating > input:checked ~ label:hover,
+        .rating > input:checked ~ label:hover ~ label,
+        .rating > label:hover ~ input:checked ~ label {
+            color: #bd716b;
+        }
+
+        .rating:not(:checked) > label:hover,
+        .rating:not(:checked) > label:hover ~ label {
+            color: #bd726b;
+        }
+
+        .rating > input:checked ~ label {
+            color: #c17a74;
+        }
+    </style>
     <!-- Customized Bootstrap Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
 </head>
@@ -67,11 +100,11 @@
             </form>
         </div>
         <%
-            Integer itemcount=null;
-            itemcount=(Integer) session.getAttribute("cartitemnumber");
-            if(itemcount!=null){
-                request.setAttribute("count",itemcount);
-            }else request.setAttribute("count",0);
+            Integer itemcount = null;
+            itemcount = (Integer) session.getAttribute("cartitemnumber");
+            if (itemcount != null) {
+                request.setAttribute("count", itemcount);
+            } else request.setAttribute("count", 0);
         %>
         <div class="col-lg-2 col-6 text-right">
             <a href="cart.jsp" class="btn border">
@@ -108,10 +141,10 @@
                     </div>
                     <a href="contact.jsp" class="nav-item nav-link">Contact</a>
                 </div>
-                <div class="navbar-nav ml-auto py-0">
-                    <a href="" class="nav-item nav-link">Login</a>
-                    <a href="" class="nav-item nav-link">Register</a>
-                </div>
+                <%--                <div class="navbar-nav ml-auto py-0">--%>
+                <%--                    <a href="login.jsp" class="nav-item nav-link">Login</a>--%>
+                <%--                    <a href="register.jsp" class="nav-item nav-link">Register</a>--%>
+                <%--                </div>--%>
             </div>
         </nav>
 
@@ -120,26 +153,42 @@
 </div>
 <!-- Navbar End -->
 <%!
-    Product product=null;
-    MongoDB db=null;
+    Product product = null;
+    MongoDB db = null;
 %>
 <%
     String id = request.getParameter("productid");
-    db=new MongoDB();
-    if(session.getAttribute("productMap")==null) {
+    db = new MongoDB();
+    if (session.getAttribute("productMap") == null) {
         ArrayList<ArrayList<String>> products = db.getAllCollection(StringRessource.getCollection(0));
         Map<Integer, Product> productMap = db.getAllProductsMap(products);
         session.setAttribute("productMap", productMap);
         session.setAttribute("products", products);
     }
     Map<Integer, Product> productMap = (Map<Integer, Product>) session.getAttribute("productMap");
-    if(id!=null) {
+    if (id != null) {
         product = productMap.get(Integer.parseInt(id));
         request.setAttribute("productdetail", product);
-    }
-    else{
+    } else {
         request.setAttribute("productdetail", null);
     }
+    ArrayList<Review> reviews= null;
+    reviews=(ArrayList<Review>) session.getAttribute("review"+id);
+    if(reviews==null){
+        assert id != null;
+        reviews=db.getReview(StringRessource.getCollection(4),id);
+        session.setAttribute("review"+id,reviews);
+        session.setAttribute("reviewsize"+id,reviews.size());
+    }
+//    else{
+//        String reviewsize= session.getAttribute("reviewsize"+id).toString();
+//        if(reviews.size()>Integer.parseInt(reviewsize)) {
+//            reviews = db.getReview(StringRessource.getCollection(4), id);
+//            session.setAttribute("review" + id, reviews);
+//            session.setAttribute("reviewsize" + id, reviews.size());
+//        }
+//    }
+    request.setAttribute("reviews",reviews);
 %>
 <!-- Shop Detail Start -->
 <c:if test="${productdetail!=null}">
@@ -171,7 +220,11 @@
                     </a>
                 </div>
             </div>
-
+            <c:set var="five" value="5"></c:set>
+            <c:set var="four" value="4"></c:set>
+            <c:set var="three" value="3"></c:set>
+            <c:set var="two" value="2"></c:set>
+            <c:set var="one" value="1"></c:set>
             <div class="col-lg-7 pb-5">
                 <h3 class="font-weight-semi-bold">${productdetail.name}</h3>
                 <div class="d-flex mb-3">
@@ -179,10 +232,10 @@
                         <small class="fas fa-star"></small>
                         <small class="fas fa-star"></small>
                         <small class="fas fa-star"></small>
-                        <small class="fas fa-star-half-alt"></small>
+                        <small class="fas fa-star"></small>
                         <small class="far fa-star"></small>
                     </div>
-                    <small class="pt-1">(50 Reviews)</small>
+                    <small class="pt-1">(${reviews.size()} Reviews)</small>
                 </div>
                 <h3 class="font-weight-semi-bold mb-4">&#8377; ${productdetail.price}</h3>
                 <p class="mb-4">Volup erat ipsum diam elitr rebum et dolor. Est nonumy elitr erat diam stet sit clita
@@ -190,8 +243,8 @@
                     Accus labore stet, est lorem sit diam sea et justo, amet at lorem et eirmod ipsum diam et rebum kasd
                     rebum.</p>
                 <form action="cart" method="post">
-                <div class="d-flex mb-3">
-                    <p class="text-dark font-weight-medium mb-0 mr-3">Sizes:</p>
+                    <div class="d-flex mb-3">
+                        <p class="text-dark font-weight-medium mb-0 mr-3">Sizes:</p>
 
                         <c:set var="i" value="1"></c:set>
                         <c:forEach var="x" items="${productdetail.size}">
@@ -214,9 +267,9 @@
                                 </c:otherwise>
                             </c:choose>
                         </c:forEach>
-                </div>
-                <div class="d-flex mb-4">
-                    <p class="text-dark font-weight-medium mb-0 mr-3">Colors:</p>
+                    </div>
+                    <div class="d-flex mb-4">
+                        <p class="text-dark font-weight-medium mb-0 mr-3">Colors:</p>
                         <c:set var="i" value="1"></c:set>
                         <c:forEach var="x" items="${productdetail.color}">
                             <c:choose>
@@ -238,31 +291,32 @@
                                 </c:otherwise>
                             </c:choose>
                         </c:forEach>
-                </div>
-                <div class="d-flex align-items-center mb-4 pt-2">
-
-                    <div class="input-group quantity mr-3" style="width: 130px;">
-                        <div class="input-group-btn">
-                            <button class="btn btn-primary" onclick="quantityminus()">
-                                <i class="fa fa-minus"></i>
-                            </button>
-                        </div>
-                        <div class="form-control bg-secondary text-center" id="display">1</div>
-
-                        <div class="input-group-btn">
-                            <button class="btn btn-primary" onclick="quantityplus()">
-                                <i class="fa fa-plus"></i>
-                            </button>
-                        </div>
                     </div>
+                    <div class="d-flex align-items-center mb-4 pt-2">
+                        <div class="input-group quantity mr-3" style="width: 130px;">
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-primary" onclick="quantityminus()">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                            <div class="form-control bg-secondary text-center" id="display">1</div>
 
-                    <input type="hidden" value="1" name="quantity" id="cartitems">
-                    <input type="hidden" value="${productdetail.price}" name="price">
-                    <input type="hidden" value="${productdetail.name}" name="name">
-                    <input type="hidden" value="${productdetail.image}" name="image">
-                    <input type="hidden" value="${productdetail.id}" name="id">
-                    <button type="submit" class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
-                </div>
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-primary" onclick="quantityplus()">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <input type="hidden" value="1" name="quantity" id="cartitems">
+                        <input type="hidden" value="${productdetail.price}" name="price">
+                        <input type="hidden" value="${productdetail.name}" name="name">
+                        <input type="hidden" value="${productdetail.image}" name="image">
+                        <input type="hidden" value="${productdetail.id}" name="id">
+                        <button type="submit" class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add
+                            To Cart
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -272,7 +326,7 @@
                 <div class="nav nav-tabs justify-content-center border-secondary mb-4">
                     <a class="nav-item nav-link active" data-toggle="tab" href="#tab-pane-1">Description</a>
                     <a class="nav-item nav-link" data-toggle="tab" href="#tab-pane-2">Information</a>
-                    <a class="nav-item nav-link" data-toggle="tab" href="#tab-pane-3">Reviews (0)</a>
+                    <a class="nav-item nav-link" data-toggle="tab" href="#tab-pane-3">Reviews (${reviews.size()})</a>
                 </div>
                 <div class="tab-content">
                     <div class="tab-pane fade show active" id="tab-pane-1">
@@ -335,50 +389,88 @@
                     </div>
                     <div class="tab-pane fade" id="tab-pane-3">
                         <div class="row">
-                            <div class="col-md-6">
-                                <h4 class="mb-4">1 review for "Colorful Stylish Shirt"</h4>
+                            <div class="col-md-6" style="height: 60vh;overflow-y:auto;">
+                            <h4 class="mb-4">${reviews.size()} review for "${productdetail.name}"</h4>
+                            <c:forEach var="review" items="${reviews}">
                                 <div class="media mb-4">
                                     <img src="img/user.jpg" alt="Image" class="img-fluid mr-3 mt-1"
                                          style="width: 45px;">
                                     <div class="media-body">
-                                        <h6>John Doe<small> - <i>01 Jan 2045</i></small></h6>
-                                        <div class="text-primary mb-2">
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star-half-alt"></i>
-                                            <i class="far fa-star"></i>
-                                        </div>
-                                        <p>Diam amet duo labore stet elitr ea clita ipsum, tempor labore accusam ipsum
-                                            et no at. Kasd diam tempor rebum magna dolores sed sed eirmod ipsum.</p>
+                                        <h6>${review.name}<small> - <i>${review.date}</i></small></h6>
+                                        <c:choose>
+                                            <c:when test="${review.rating==five}">
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="fas fa-star text-primary"></small>
+                                            </c:when>
+                                            <c:when test="${review.rating==four}">
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="far fa-star text-primary"></small>
+                                            </c:when>
+                                            <c:when test="${review.rating==three}">
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="far fa-star text-primary"></small>
+                                                <small class="far fa-star text-primary"></small>
+                                            </c:when>
+                                            <c:when test="${review.rating==two}">
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="far fa-star text-primary"></small>
+                                                <small class="far fa-star text-primary"></small>
+                                                <small class="far fa-star text-primary"></small>
+                                            </c:when>
+                                            <c:when test="${review.rating==one}">
+                                                <small class="fas fa-star text-primary"></small>
+                                                <small class="far fa-star text-primary"></small>
+                                                <small class="far fa-star text-primary"></small>
+                                                <small class="far fa-star text-primary"></small>
+                                                <small class="far fa-star text-primary"></small>
+                                            </c:when>
+                                        </c:choose>
+                                        <p>${review.review}</p>
                                     </div>
                                 </div>
+                            </c:forEach>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6" style="height: 60vh;overflow-y:auto;">
                                 <h4 class="mb-4">Leave a review</h4>
                                 <small>Your email address will not be published. Required fields are marked *</small>
-                                <div class="d-flex my-3">
-                                    <p class="mb-0 mr-2">Your Rating * :</p>
-                                    <div class="text-primary">
-                                        <i class="far fa-star"></i>
-                                        <i class="far fa-star"></i>
-                                        <i class="far fa-star"></i>
-                                        <i class="far fa-star"></i>
-                                        <i class="far fa-star"></i>
-                                    </div>
-                                </div>
                                 <form action="review" method="post">
+                                    <div class="d-flex my-3" style="align-items: center;">
+                                        <p class="mb-0 mr-2">Your Rating * :</p>
+                                        <div class="rating">
+                                            <input value="5" name="rating" id="star5" type="radio">
+                                            <label title="text" for="star5"></label>
+                                            <input value="4" name="rating" id="star4" type="radio">
+                                            <label title="text" for="star4"></label>
+                                            <input value="3" name="rating" id="star3" type="radio" checked="">
+                                            <label title="text" for="star3"></label>
+                                            <input value="2" name="rating" id="star2" type="radio">
+                                            <label title="text" for="star2"></label>
+                                            <input value="1" name="rating" id="star1" type="radio">
+                                            <label title="text" for="star1"></label>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" value="${productdetail.id}" name="id">
                                     <div class="form-group">
                                         <label for="message">Your Review *</label>
-                                        <textarea id="message" cols="30" rows="5" class="form-control"></textarea>
+                                        <textarea id="message" name="message" cols="30" rows="5" class="form-control"
+                                                  required></textarea>
                                     </div>
                                     <div class="form-group">
                                         <label for="name">Your Name *</label>
-                                        <input type="text" class="form-control" id="name">
+                                        <input type="text" name="name" class="form-control" id="name" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="email">Your Email *</label>
-                                        <input type="email" class="form-control" id="email">
+                                        <input type="email" name="email" class="form-control" id="email" required>
                                     </div>
                                     <div class="form-group mb-0">
                                         <input type="submit" value="Leave Your Review" class="btn btn-primary px-3">
@@ -394,16 +486,16 @@
     <!-- Shop Detail End -->
 </c:if>
 <%
-    Cookie[] cookie=request.getCookies();
-    String gender="";
-    String material="";
-    if(product!=null) {
-        gender= product.getGender();
+    Cookie[] cookie = request.getCookies();
+    String gender = "";
+    String material = "";
+    if (product != null) {
+        gender = product.getGender();
         material = product.getMaterial();
     }
-    ArrayList<ArrayList<String>> products=null;
-    products =(ArrayList<ArrayList<String>>) db.filterByMaterialAndGender(StringRessource.getCollection(0), material, gender);
-    if(id!=null) {
+    ArrayList<ArrayList<String>> products = null;
+    products = (ArrayList<ArrayList<String>>) db.filterByMaterialAndGender(StringRessource.getCollection(0), material, gender);
+    if (id != null) {
         for (int i = 0; i < products.size(); i++) {
             if (Objects.equals(products.get(i).get(1), id)) {
                 products.remove(products.get(i));
@@ -475,17 +567,19 @@
     let data = 1;
     document.getElementById("display").innerHTML = data;
     document.getElementById("cartitems").value = data;
+
     function quantityplus() {
         if (data < 10) {
             data = data + 1;
-            document.getElementById("display").innerHTML  = data;
+            document.getElementById("display").innerHTML = data;
             document.getElementById("cartitems").value = data;
         }
     }
+
     function quantityminus() {
         if (data > 1) {
             data = data - 1;
-            document.getElementById("display").innerHTML  = data;
+            document.getElementById("display").innerHTML = data;
             document.getElementById("cartitems").value = data;
         }
     }
