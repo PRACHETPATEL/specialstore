@@ -393,7 +393,7 @@
                             <h4 class="mb-4">${reviews.size()} review for "${productdetail.name}"</h4>
                             <c:forEach var="review" items="${reviews}">
                                 <div class="media mb-4">
-                                    <img src="img/user.jpg" alt="Image" class="img-fluid mr-3 mt-1"
+                                    <img src="img/user.png" alt="Image" class="img-fluid mr-3 mt-1"
                                          style="width: 45px;">
                                     <div class="media-body">
                                         <h6>${review.name}<small> - <i>${review.date}</i></small></h6>
