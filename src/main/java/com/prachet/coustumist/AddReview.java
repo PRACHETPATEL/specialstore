@@ -32,17 +32,17 @@ public class AddReview extends HttpServlet{
                 db.addReview(StringRessource.getCollection(4),review);
                 ArrayList<Review> reviews=db.getReview(StringRessource.getCollection(4),productid);
                 HttpSession session=request.getSession(false);
-                session.setAttribute("review"+id,reviews);
-                session.setAttribute("reviewsize"+id,reviews.size());
+                if(session!=null) {
+                        session.setAttribute("review" + id, reviews);
+                        session.setAttribute("reviewsize" + id, reviews.size());
+                }
                 String url=request.getRequestURI();
                 String uri=url.substring(0, url.indexOf("review"));
                 response.sendRedirect(uri+"productdetail.jsp?productid="+productid);
         }
-
         public void doGet(HttpServletRequest request,HttpServletResponse response)throws IOException,ServletException{
                 RequestDispatcher rd=request.getRequestDispatcher("productdetail.jsp");
                 request.setAttribute("productid",this.id);
                 rd.forward(request,response);
         }
-
 }

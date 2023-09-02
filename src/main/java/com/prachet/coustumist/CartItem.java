@@ -27,16 +27,17 @@ public class CartItem extends HttpServlet {
         String color=request.getParameter("color");
         HttpSession session=request.getSession(false);
         Cart cart=new Cart(id,img,name,quantity,price,size,color);
-        Map<Integer,Cart> cartitems=(Map<Integer,Cart>) session.getAttribute("cart");
-        if(cartitems==null){
-            cartitems=new HashMap<>();
-            cartitems.put(Integer.parseInt(id),cart);
+        if(session!=null) {
+            Map<Integer, Cart> cartitems = (Map<Integer, Cart>) session.getAttribute("cart");
+            if (cartitems == null) {
+                cartitems = new HashMap<>();
+                cartitems.put(Integer.parseInt(id), cart);
+            } else {
+                cartitems.put(Integer.parseInt(id), cart);
+            }
+            session.setAttribute("cart", cartitems);
+            session.setAttribute("cartitemnumber", cartitems.size());
         }
-        else{
-            cartitems.put(Integer.parseInt(id),cart);
-        }
-        session.setAttribute("cart",cartitems);
-        session.setAttribute("cartitemnumber",cartitems.size());
         response.sendRedirect("cart.jsp");
     }
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{

@@ -2,7 +2,8 @@
 <%@ page import="com.prachet.utilities.Cart" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Set" %>
-<%@ page import="com.prachet.utilities.User" %><%--
+<%@ page import="com.prachet.utilities.User" %>
+<%@ page import="com.prachet.utilities.UserAddress" %><%--
   Created by IntelliJ IDEA.
   User: PRACHET
   Date: 8/12/2023
@@ -77,10 +78,16 @@
             } else request.setAttribute("count", 0);
             Map<Integer, Cart> cartitems = (Map<Integer, Cart>) session.getAttribute("cart");
             Set<Map.Entry<Integer, Cart>> items = null;
+            int total=0;
             if (cartitems != null) {
                 items = cartitems.entrySet();
+                for(Map.Entry<Integer, Cart> item:items){
+                    total+=(item.getValue().getPrice()*item.getValue().getQuantity());
+                }
             }
             request.setAttribute("items", items);
+            session.setAttribute("checkoutitems",items);
+            session.setAttribute("checkoutprice",total);
         %>
         <div class="col-lg-2 col-6 text-right">
             <a href="cart.jsp" class="btn border">
@@ -117,10 +124,10 @@
                     </div>
                     <a href="contact.jsp" class="nav-item nav-link">Contact</a>
                 </div>
-<%--                <div class="navbar-nav ml-auto py-0">--%>
-<%--                    <a href="login.jsp" class="nav-item nav-link">Login</a>--%>
-<%--                    <a href="register.jsp" class="nav-item nav-link">Register</a>--%>
-<%--                </div>--%>
+                <%--                <div class="navbar-nav ml-auto py-0">--%>
+                <%--                    <a href="login.jsp" class="nav-item nav-link">Login</a>--%>
+                <%--                    <a href="register.jsp" class="nav-item nav-link">Register</a>--%>
+                <%--                </div>--%>
             </div>
         </nav>
     </div>
@@ -141,185 +148,287 @@
     </div>
 </div>
 <!-- Page Header End -->
-
+<%
+    UserAddress userAddress = (UserAddress) session.getAttribute("address");
+    String verify=(String) session.getAttribute("currentemail");
+    request.setAttribute("address", userAddress);
+    request.setAttribute("verify",verify);
+%>
 
 <!-- Checkout Start -->
 <div class="container-fluid pt-5">
     <div class="row px-xl-5">
-        <div class="col-lg-8">
-            <div class="mb-4">
-                <h4 class="font-weight-semi-bold mb-4">Billing Address</h4>
-                <div class="row">
-                    <div class="col-md-6 form-group">
-                        <label>First Name</label>
-                        <input class="form-control" type="text" placeholder="John">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Last Name</label>
-                        <input class="form-control" type="text" placeholder="Doe">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>E-mail</label>
-                        <input class="form-control" type="text" placeholder="example@email.com">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Mobile No</label>
-                        <input class="form-control" type="text" placeholder="+123 456 789">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Address Line 1</label>
-                        <input class="form-control" type="text" placeholder="123 Street">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Address Line 2</label>
-                        <input class="form-control" type="text" placeholder="123 Street">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Country</label>
-                        <select class="custom-select">
-                            <option selected>United States</option>
-                            <option>Afghanistan</option>
-                            <option>Albania</option>
-                            <option>Algeria</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>City</label>
-                        <input class="form-control" type="text" placeholder="New York">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>State</label>
-                        <input class="form-control" type="text" placeholder="New York">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>ZIP Code</label>
-                        <input class="form-control" type="text" placeholder="123">
-                    </div>
-                    <div class="col-md-12 form-group">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="newaccount">
-                            <label class="custom-control-label" for="newaccount">Create an account</label>
-                        </div>
-                    </div>
-                    <div class="col-md-12 form-group">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="shipto">
-                            <label class="custom-control-label" for="shipto" data-toggle="collapse"
-                                   data-target="#shipping-address">Ship to different address</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="collapse mb-4" id="shipping-address">
-                <h4 class="font-weight-semi-bold mb-4">Shipping Address</h4>
-                <div class="row">
-                    <div class="col-md-6 form-group">
-                        <label>First Name</label>
-                        <input class="form-control" type="text" placeholder="John">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Last Name</label>
-                        <input class="form-control" type="text" placeholder="Doe">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>E-mail</label>
-                        <input class="form-control" type="text" placeholder="example@email.com">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Mobile No</label>
-                        <input class="form-control" type="text" placeholder="+123 456 789">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Address Line 1</label>
-                        <input class="form-control" type="text" placeholder="123 Street">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Address Line 2</label>
-                        <input class="form-control" type="text" placeholder="123 Street">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>Country</label>
-                        <select class="custom-select">
-                            <option selected>United States</option>
-                            <option>Afghanistan</option>
-                            <option>Albania</option>
-                            <option>Algeria</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>City</label>
-                        <input class="form-control" type="text" placeholder="New York">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>State</label>
-                        <input class="form-control" type="text" placeholder="New York">
-                    </div>
-                    <div class="col-md-6 form-group">
-                        <label>ZIP Code</label>
-                        <input class="form-control" type="text" placeholder="123">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="card border-secondary mb-5">
-                <div class="card-header bg-secondary border-0">
-                    <h4 class="font-weight-semi-bold m-0">Order Total</h4>
-                </div>
-                <div class="card-body">
-                    <h5 class="font-weight-medium mb-3">Products</h5>
-                    <c:set var="subtotal" value="0"></c:set>
-                    <c:if test="${items!=null}">
-                        <c:forEach var="item" items="${items}">
-                            <div class="d-flex justify-content-between">
-                                <p>${item.value.name}(${item.value.size}, ${item.value.color})x${item.value.quantity}</p>
-                                <p>&#8377; ${item.value.quantity*item.value.price}</p>
-                                <c:set var="subtotal" value="${subtotal+(item.value.quantity*item.value.price)}"></c:set>
+        <c:choose>
+            <c:when test="${address==null}">
+                <div class="col-lg-8">
+                    <form action="address" method="post">
+                        <div class="mb-4">
+                            <h4 class="font-weight-semi-bold mb-4">Billing/Shipping Address</h4>
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label>First Name</label>
+                                    <input class="form-control" name="fname" type="text" placeholder="Your Name"
+                                           required>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>Last Name</label>
+                                    <input class="form-control" name="lname" type="text" placeholder="Sure Name"
+                                           required>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>E-mail</label>
+                                    <input class="form-control" name="email" type="text" placeholder="example@email.com"
+                                           required>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>Mobile No</label>
+                                    <input class="form-control" name="phone" type="text" maxlength="10"
+                                           placeholder="1234567890" required>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>Address</label>
+                                    <textarea rows="3" name="address" class="form-control" type="text"
+                                              placeholder="house/flat No, Street, landmark, town/village."></textarea>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>Country</label>
+                                    <select name="country" class="custom-select">
+                                        <option selected value="India">India</option>
+                                            <%--                            <option>Afghanistan</option>--%>
+                                            <%--                            <option>Albania</option>--%>
+                                            <%--                            <option>Algeria</option>--%>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>City</label>
+                                    <input class="form-control" name="city" type="text" placeholder="Anand" required>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>State</label>
+                                    <input class="form-control" name="state" type="text" placeholder="Gujarat" required>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>PIN Code</label>
+                                    <input class="form-control" name="pincode" type="text" maxlength="6"
+                                           placeholder="400001" required>
+                                </div>
+                                    <%--                    <div class="col-md-12 form-group">--%>
+                                    <%--                        <div class="custom-control custom-checkbox">--%>
+                                    <%--                            <input type="checkbox" class="custom-control-input" id="shipto">--%>
+                                    <%--                            <label class="custom-control-label" for="shipto" data-toggle="collapse"--%>
+                                    <%--                                   data-target="#">Ship to different address</label>--%>
+                                    <%--                        </div>--%>
+                                    <%--                    </div>--%>
                             </div>
-                        </c:forEach>
-                    </c:if>
-                    <hr class="mt-0">
-                    <div class="d-flex justify-content-between mb-3 pt-1">
-                        <h6 class="font-weight-medium">Subtotal</h6>
-                        <h6 class="font-weight-medium">&#8377; ${subtotal}</h6>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <h6 class="font-weight-medium">Shipping</h6>
-                        <h6 class="font-weight-medium">&#8377; 0</h6>
-                    </div>
+                            <div class="d-flex flex-column" style="align-items: center;">
+                                <button class="btn  btn-primary font-weight-bold my-3 py-1" type="submit"
+                                        style=" width: 35%;">
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-                <div class="card-footer border-secondary bg-transparent">
-                    <div class="d-flex justify-content-between mt-2">
-                        <h5 class="font-weight-bold">Total</h5>
-                        <h5 class="font-weight-bold">&#8377; ${subtotal}</h5>
-                    </div>
-                </div>
-            </div>
-            <div class="card border-secondary mb-5">
-                <div class="card-header bg-secondary border-0">
-                    <h4 class="font-weight-semi-bold m-0">Payment</h4>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="paytm">
-                            <label class="custom-control-label" for="paytm">Paytm</label>
+                <div class="col-lg-4">
+                    <div class="card border-secondary mb-5">
+                        <div class="card-header bg-secondary border-0">
+                            <h4 class="font-weight-semi-bold m-0">Order Total</h4>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="font-weight-medium mb-3">Products</h5>
+                            <c:set var="subtotal" value="0"></c:set>
+                            <c:if test="${items!=null}">
+                                <c:forEach var="item" items="${items}">
+                                    <div class="d-flex justify-content-between">
+                                        <p>${item.value.name}(${item.value.size}, ${item.value.color})x${item.value.quantity}</p>
+                                        <p>&#8377; ${item.value.quantity*item.value.price}</p>
+                                        <c:set var="subtotal"
+                                               value="${subtotal+(item.value.quantity*item.value.price)}"></c:set>
+                                    </div>
+                                </c:forEach>
+                            </c:if>
+                            <hr class="mt-0">
+                            <div class="d-flex justify-content-between mb-3 pt-1">
+                                <h6 class="font-weight-medium">Subtotal</h6>
+                                <h6 class="font-weight-medium">&#8377; ${subtotal}</h6>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <h6 class="font-weight-medium">Shipping</h6>
+                                <h6 class="font-weight-medium">&#8377; 0</h6>
+                            </div>
+                        </div>
+                        <div class="card-footer border-secondary bg-transparent">
+                            <div class="d-flex justify-content-between mt-2">
+                                <h5 class="font-weight-bold">Total</h5>
+                                <h5 class="font-weight-bold">&#8377; ${subtotal}</h5>
+                            </div>
                         </div>
                     </div>
-                    <div class="">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="banktransfer" readonly>
-                            <label class="custom-control-label" for="banktransfer">Bank Transfer</label>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div class="col-lg-8">
+                    <div>
+                        <div class="col-md-12 form-group">
+                            <div class="custom-control" style="border: 1px solid #666;
+    border-color: #EDF1FF !important;
+    padding-left: 2%;
+    padding-top: 2%;
+    border-radius: 10px;">
+                                <h5>Shipping Details</h5>
+                                    ${address.fname} ${address.lname} <br>
+                                    ${address.email}<br>
+                                    ${address.phone}<br>
+                                    ${address.address}<br>
+                                    ${address.pin}-${address.city}<br>
+                                    ${address.state}<br>
+                                    ${address.country}<br>
+                            </div>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="shipto">
+                                <label class="custom-control-label" for="shipto" data-toggle="collapse"
+                                       data-target="#change-address">Change address</label>
+                            </div>
                         </div>
                     </div>
+                    <div class="collapse mb-4" id="change-address">
+                        <form action="address" method="post">
+                            <div class="mb-4">
+                                <h4 class="font-weight-semi-bold">Change Address</h4>
+                                <div class="row">
+                                    <div class="col-md-6 form-group">
+                                        <label>First Name</label>
+                                        <input class="form-control" name="fname" type="text" placeholder="Your Name"
+                                               required>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label>Last Name</label>
+                                        <input class="form-control" name="lname" type="text" placeholder="Sure Name"
+                                               required>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label>E-mail</label>
+                                        <input class="form-control" name="email" type="text"
+                                               placeholder="example@email.com" required>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label>Mobile No</label>
+                                        <input class="form-control" name="phone" type="text" maxlength="10"
+                                               placeholder="1234567890" required>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label>Address</label>
+                                        <textarea rows="3" name="address" class="form-control" type="text"
+                                                  placeholder="house/flat No, Street, landmark, town/village."></textarea>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label>Country</label>
+                                        <select name="country" class="custom-select">
+                                            <option selected value="India">India</option>
+                                                <%--                            <option>Afghanistan</option>--%>
+                                                <%--                            <option>Albania</option>--%>
+                                                <%--                            <option>Algeria</option>--%>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label>City</label>
+                                        <input class="form-control" name="city" type="text" placeholder="Anand"
+                                               required>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label>State</label>
+                                        <input class="form-control" name="state" type="text" placeholder="Gujarat"
+                                               required>
+                                    </div>
+                                    <div class="col-md-6 form-group">
+                                        <label>PIN Code</label>
+                                        <input class="form-control" name="pincode" type="text" maxlength="6"
+                                               placeholder="400001" required>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column" style="align-items: center;">
+                                    <button class="btn  btn-primary font-weight-bold my-3 py-1" type="submit"
+                                            style=" width: 35%;">
+                                        Submit
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="card-footer border-secondary bg-transparent">
-                    <button class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Place Order</button>
+
+                <div class="col-lg-4">
+                    <div class="card border-secondary mb-5">
+                        <div class="card-header bg-secondary border-0">
+                            <h4 class="font-weight-semi-bold m-0">Order Total</h4>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="font-weight-medium mb-3">Products</h5>
+                            <c:set var="subtotal" value="0"></c:set>
+                            <c:if test="${items!=null}">
+                                <c:forEach var="item" items="${items}">
+                                    <div class="d-flex justify-content-between">
+                                        <p>${item.value.name}(${item.value.size}, ${item.value.color})x${item.value.quantity}</p>
+                                        <p>&#8377; ${item.value.quantity*item.value.price}</p>
+                                        <c:set var="subtotal"
+                                               value="${subtotal+(item.value.quantity*item.value.price)}"></c:set>
+                                    </div>
+                                </c:forEach>
+                            </c:if>
+                            <hr class="mt-0">
+                            <div class="d-flex justify-content-between mb-3 pt-1">
+                                <h6 class="font-weight-medium">Subtotal</h6>
+                                <h6 class="font-weight-medium">&#8377; ${subtotal}</h6>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <h6 class="font-weight-medium">Shipping</h6>
+                                <h6 class="font-weight-medium">&#8377; 0</h6>
+                            </div>
+                        </div>
+                        <div class="card-footer border-secondary bg-transparent">
+                            <div class="d-flex justify-content-between mt-2">
+                                <h5 class="font-weight-bold">Total</h5>
+                                <h5 class="font-weight-bold">&#8377; ${subtotal}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card border-secondary mb-5">
+                        <div class="card-header bg-secondary border-0">
+                            <h4 class="font-weight-semi-bold m-0">Payment</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" class="custom-control-input" name="payment" id="paytm" checked>
+                                    <label class="custom-control-label" for="paytm">Online</label>
+                                </div>
+                            </div>
+<%--                            <div class="">--%>
+<%--                                <div class="custom-control custom-radio">--%>
+<%--                                    <input type="radio" class="custom-control-input" name="payment" id="banktransfer"--%>
+<%--                                           readonly>--%>
+<%--                                    <label class="custom-control-label" for="banktransfer">Bank Transfer</label>--%>
+<%--                                </div>--%>
+<%--                            </div>--%>
+                        </div>
+                        <c:if test="${subtotal!=0}">
+                            <c:if test="${verify.equals(\"true\")}">
+                        <div class="card-footer border-secondary bg-transparent">
+                            <a href="checkout" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Place Order
+                            </a>
+                        </div>
+                            </c:if>
+                        </c:if>
+                    </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </c:otherwise>
+        </c:choose>
     </div>
 </div>
+
 <!-- Checkout End -->
 <%@ include file="footer_normal.jsp" %>
 
