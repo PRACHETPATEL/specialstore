@@ -416,8 +416,8 @@
                         <c:if test="${subtotal!=0}">
                             <c:if test="${verify.equals(\"true\")}">
                         <div class="card-footer border-secondary bg-transparent">
-                            <a href="checkout" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Place Order
-                            </a>
+                            <button onclick="paymentStart(${subtotal})" class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Place Order
+                            </button>
                         </div>
                             </c:if>
                         </c:if>
@@ -441,7 +441,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 <script src="lib/easing/easing.min.js"></script>
 <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-
+<script src="js/payment.js"></script>
 <!-- Contact Javascript File -->
 <script src="mail/jqBootstrapValidation.min.js"></script>
 <script src="mail/contact.js"></script>
